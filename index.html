@@ -4,26 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>КастомДизайн — Каталог фотообоев</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f2ee;
+    --bg: #FAF2E5;
     --surface: #ffffff;
-    --text: #1a1714;
-    --muted: #8a857e;
-    --accent: #c8a96e;
-    --accent-dark: #9c7d47;
-    --border: #e4dfd8;
-    --tag-bg: #edeae5;
+    --text: #000000;
+    --muted: #888888;
+    --accent: #FE7144;
+    --accent-dark: #e55a2b;
+    --border: #e8dfd0;
+    --tag-bg: #f0e8d8;
     --shadow: 0 2px 20px rgba(0,0,0,0.07);
     --shadow-hover: 0 8px 40px rgba(0,0,0,0.14);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
   /* HEADER */
   header {
-    background: var(--text); color: #f5f2ee;
+    background: #CCBDA1; color: #000000;
     padding: 0 40px; display: flex;
     align-items: center; justify-content: space-between;
     height: 72px;
@@ -31,7 +31,7 @@
     transition: background 0.3s ease, backdrop-filter 0.3s ease;
   }
   header.scrolled {
-    background: rgba(26,23,20,0.75);
+    background: rgba(204,189,161,0.9);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
@@ -40,7 +40,7 @@
   .header-nav {
     position: absolute; left: 50%; transform: translateX(-50%);
   }
-  .logo { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; }
+  .logo { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; }
   .header-top-row { display: contents; }
   .logo em { color: var(--accent); font-style: normal; }
   .header-sub { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #8a857e; font-weight: 300; }
@@ -49,13 +49,13 @@
   .header-nav { display: flex; gap: 4px; }
   .nav-tab { white-space: nowrap; }
   .nav-tab {
-    padding: 7px 20px; background: transparent; border: 1px solid rgba(245,242,238,0.2);
-    color: rgba(245,242,238,0.55); font-family: 'Jost', sans-serif;
+    padding: 7px 20px; background: #CCBDA1; border: 1.5px solid #000000;
+    color: #000000; font-family: 'Manrope', sans-serif;
     font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
     cursor: pointer; border-radius: 4px; transition: all 0.2s;
   }
-  .nav-tab:hover { border-color: var(--accent); color: var(--accent); }
-  .nav-tab.active { background: var(--accent); border-color: var(--accent); color: #1a1714; font-weight: 500; }
+  .nav-tab:hover { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+  .nav-tab.active { background: var(--accent); border-color: var(--accent); color: #ffffff; font-weight: 600; }
 
   /* LAYOUT */
   .layout { display: grid; grid-template-columns: 290px 1fr; min-height: calc(100vh - 72px); isolation: isolate; }
@@ -81,7 +81,7 @@
   .search-input {
     width: 100%; padding: 10px 14px 10px 38px;
     border: 1px solid var(--border); border-radius: 4px;
-    background: var(--bg); font-family: 'Jost', sans-serif;
+    background: var(--bg); font-family: 'Manrope', sans-serif;
     font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s;
   }
   .search-input:focus { border-color: var(--accent); }
@@ -91,7 +91,7 @@
   .size-options { display: flex; flex-direction: column; gap: 6px; }
   .size-btn {
     padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px;
-    background: transparent; font-family: 'Jost', sans-serif; font-size: 13px;
+    background: transparent; font-family: 'Manrope', sans-serif; font-size: 13px;
     color: var(--text); cursor: pointer; text-align: left; transition: all 0.18s;
     display: flex; align-items: center; justify-content: space-between;
   }
@@ -104,7 +104,7 @@
   .color-chip {
     padding: 5px 10px; border: 1px solid var(--border); border-radius: 20px;
     font-size: 11px; cursor: pointer; transition: all 0.18s; background: transparent;
-    font-family: 'Jost', sans-serif; color: var(--text); white-space: nowrap;
+    font-family: 'Manrope', sans-serif; color: var(--text); white-space: nowrap;
     display: flex; align-items: center; gap: 5px;
   }
   .color-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); flex-shrink: 0; }
@@ -113,7 +113,7 @@
 
   .reset-btn {
     width: 100%; padding: 9px; background: transparent; border: 1px solid var(--border);
-    border-radius: 4px; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--muted);
+    border-radius: 4px; font-family: 'Manrope', sans-serif; font-size: 11px; color: var(--muted);
     cursor: pointer; transition: all 0.18s; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 6px;
   }
   .reset-btn:hover { border-color: var(--text); color: var(--text); }
@@ -121,7 +121,7 @@
   /* MAIN */
   .main { padding: 28px 36px; position: relative; z-index: 1; }
   .results-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-  .results-count { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; }
+  .results-count { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 300; }
   .results-count span { color: var(--accent-dark); }
   .results-meta { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
 
@@ -173,7 +173,7 @@
   .lightbox-close:hover { color: #f5f2ee; transform: rotate(90deg); }
   .lightbox-name {
     position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
-    color: rgba(245,242,238,0.75); font-family: 'Cormorant Garamond', serif;
+    color: rgba(245,242,238,0.75); font-family: 'Manrope', sans-serif;
     font-size: 18px; font-weight: 300; letter-spacing: 1px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80vw;
   }
@@ -191,7 +191,7 @@
   }
   .card-body { padding: 14px; }
   .card-name {
-    font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 400;
+    font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 400;
     margin-bottom: 9px; line-height: 1.3;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
@@ -213,7 +213,7 @@
   .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 44px; padding-bottom: 44px; }
   .page-btn {
     min-width: 38px; height: 38px; padding: 0 10px; border: 1px solid var(--border);
-    border-radius: 4px; background: transparent; font-family: 'Jost', sans-serif;
+    border-radius: 4px; background: transparent; font-family: 'Manrope', sans-serif;
     font-size: 13px; color: var(--text); cursor: pointer; transition: all 0.18s;
     display: flex; align-items: center; justify-content: center;
   }
@@ -225,16 +225,16 @@
   /* STATES */
   .empty { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--muted); }
   .empty-icon { font-size: 44px; margin-bottom: 14px; }
-  .empty-text { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; }
+  .empty-text { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 300; }
   .empty-sub { font-size: 13px; margin-top: 6px; }
 
   .loading-screen {
-    position: fixed; inset: 0; background: var(--bg);
+    position: fixed; inset: 0; background: #FAF2E5;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 999; gap: 20px;
   }
-  .loading-logo { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; }
-  .loading-logo em { color: var(--accent); font-style: normal; }
+  .loading-logo { font-family: 'Manrope', sans-serif; font-size: 36px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; }
+  .loading-logo em { color: var(--accent); font-style: normal; display: none; }
   .loading-bar { width: 200px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
   .loading-bar-fill { height: 100%; background: var(--accent); border-radius: 1px; animation: loadbar 2s ease-in-out infinite; }
   .loading-text { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
@@ -242,7 +242,7 @@
   .error-screen {
     grid-column: 1/-1; text-align: center; padding: 60px 20px;
   }
-  .error-screen h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; margin-bottom: 12px; color: var(--text); }
+  .error-screen h2 { font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 300; margin-bottom: 12px; color: var(--text); }
   .error-screen p { font-size: 13px; color: var(--muted); line-height: 1.7; }
   .error-screen code { background: var(--tag-bg); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
 
@@ -286,16 +286,19 @@
   /* ── CART BUTTON IN HEADER ── */
   .cart-btn {
     display: flex; align-items: center; gap: 8px;
-    background: transparent; border: 1px solid rgba(245,242,238,0.25);
-    color: #f5f2ee; padding: 8px 16px; border-radius: 4px;
-    font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 2px;
+    background: #CCBDA1; border: 1.5px solid #000000;
+    color: #000000; padding: 8px 16px; border-radius: 4px;
+    font-family: 'Manrope', sans-serif; font-size: 11px; letter-spacing: 2px;
     text-transform: uppercase; cursor: pointer; transition: all 0.2s;
   }
-  .cart-btn:hover { background: rgba(245,242,238,0.1); border-color: var(--accent); }
+  .cart-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
   .cart-count {
-    background: var(--accent); color: #1a1714; border-radius: 50%;
-    width: 18px; height: 18px; display: flex; align-items: center;
-    justify-content: center; font-size: 10px; font-weight: 600;
+    background: var(--accent); color: #ffffff; border-radius: 50%;
+    width: 18px; height: 18px; min-width: 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; line-height: 1;
+    text-align: center; padding: 0;
+    font-family: Arial, sans-serif;
     transition: transform 0.2s;
   }
   .cart-count.bump { transform: scale(1.4); }
@@ -304,7 +307,7 @@
   .card-add-btn {
     display: block; width: 100%; margin-top: 8px; padding: 8px;
     background: transparent; border: 1px solid var(--border);
-    border-radius: 4px; font-family: 'Jost', sans-serif;
+    border-radius: 4px; font-family: 'Manrope', sans-serif;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
     color: var(--muted); cursor: pointer; transition: all 0.2s;
   }
@@ -338,7 +341,7 @@
     display: flex; align-items: center; justify-content: space-between;
     flex-shrink: 0;
   }
-  .cart-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; }
+  .cart-title { font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 300; }
   .cart-close {
     background: none; border: none; font-size: 22px; cursor: pointer;
     color: var(--muted); transition: color 0.2s, transform 0.2s; line-height: 1;
@@ -356,7 +359,7 @@
     justify-content: center; height: 100%; color: var(--muted); gap: 12px;
   }
   .cart-empty-icon { font-size: 40px; }
-  .cart-empty-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; }
+  .cart-empty-text { font-family: 'Manrope', sans-serif; font-size: 20px; font-weight: 300; }
 
   .cart-item {
     display: grid; grid-template-columns: 64px 1fr auto;
@@ -372,7 +375,7 @@
     display: flex; align-items: center; justify-content: center; font-size: 20px;
   }
   .cart-item-name {
-    font-family: 'Cormorant Garamond', serif; font-size: 15px;
+    font-family: 'Manrope', sans-serif; font-size: 15px;
     margin-bottom: 4px; line-height: 1.3;
   }
   .cart-item-meta { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
@@ -392,7 +395,7 @@
   }
   .cart-copy-btn {
     width: 100%; padding: 14px; background: var(--text); border: none;
-    border-radius: 4px; font-family: 'Jost', sans-serif; font-size: 12px;
+    border-radius: 4px; font-family: 'Manrope', sans-serif; font-size: 12px;
     letter-spacing: 2.5px; text-transform: uppercase; color: #f5f2ee;
     cursor: pointer; transition: all 0.2s;
   }
@@ -401,7 +404,7 @@
   .cart-clear-btn {
     width: 100%; padding: 9px; background: transparent;
     border: 1px solid var(--border); border-radius: 4px;
-    font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 2px;
+    font-family: 'Manrope', sans-serif; font-size: 10px; letter-spacing: 2px;
     text-transform: uppercase; color: var(--muted); cursor: pointer;
     transition: all 0.2s; margin-top: 8px;
   }
@@ -412,14 +415,14 @@
 
 <!-- LOADING SCREEN -->
 <div class="loading-screen" id="loadingScreen">
-  <div class="loading-logo">Кастом<em>Дизайн</em></div>
+  <div class="loading-logo">КастомДизайн</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
   <div class="loading-text">Загрузка каталога...</div>
 </div>
 
 <header>
   <div class="header-top-row">
-    <div class="logo">Кастом<em>Дизайн</em></div>
+    <div class="logo">КастомДизайн</div>
     <button class="cart-btn" onclick="openCart()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       <span class="cart-label">Корзина</span>
