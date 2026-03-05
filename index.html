@@ -715,6 +715,10 @@ function toggleCartBtn(el) {
     photo: el.dataset.photo,
   };
   toggleCart(p);
+  // Update just this button — no full page re-render
+  const inCart = cartItems.has(p.stockKey);
+  el.textContent = inCart ? '✓ В корзине' : '+ В корзину';
+  el.classList.toggle('in-cart', inCart);
 }
 
 function toggleCart(p) {
@@ -724,21 +728,26 @@ function toggleCart(p) {
     cartItems.set(p.stockKey, p);
   }
   updateCartCount();
-  renderGrid(); // refresh card button states
 }
 
 function removeFromCart(stockKey) {
   cartItems.delete(stockKey);
   updateCartCount();
   renderCartPanel();
-  renderGrid();
+  // Update the matching card button in the grid without re-render
+  const btn = document.querySelector(`.card-add-btn[data-key="${stockKey}"]`);
+  if (btn) { btn.textContent = '+ В корзину'; btn.classList.remove('in-cart'); }
 }
 
 function clearCart() {
   cartItems.clear();
   updateCartCount();
   renderCartPanel();
-  renderGrid();
+  // Reset all cart buttons in the grid
+  document.querySelectorAll('.card-add-btn.in-cart').forEach(btn => {
+    btn.textContent = '+ В корзину';
+    btn.classList.remove('in-cart');
+  });
 }
 
 function updateCartCount() {
