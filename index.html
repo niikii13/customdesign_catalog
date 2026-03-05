@@ -567,7 +567,11 @@ async function loadCatalog(catalogKey) {
   }
 
   const prog = document.getElementById('loadingProgress');
-  if (prog) prog.textContent = 'Загрузка...';
+
+  // Грузим остатки и товары параллельно
+  // Остатки маленькие — придут быстро
+  // Как только оба готовы — показываем каталог
+  if (prog) prog.textContent = 'Загрузка каталога...';
 
   const [prodData, stockData] = await Promise.all([
     fetchFromScript(catalogKey, 'products'),
@@ -579,7 +583,6 @@ async function loadCatalog(catalogKey) {
   allProducts = prodData.products;
   stockMap    = stockData.stock;
 
-  // Save to cache
   catalogCache[catalogKey] = { products: allProducts, stock: stockMap };
 }
 
@@ -977,6 +980,10 @@ document.addEventListener('keydown', e => {
 window.addEventListener('scroll', () => {
   document.querySelector('header').classList.toggle('scrolled', window.scrollY > 10);
 }, { passive: true });
+
+// Прогрев скриптов — отправляем запрос заранее пока DOM грузится
+const _warmupWallpaper = fetch(CONFIG.SCRIPT_URL_WALLPAPER + '?catalog=wallpaper&action=stock');
+const _warmupPainting  = fetch(CONFIG.SCRIPT_URL_PAINTING  + '?catalog=painting&action=stock');
 
 init();
 </script>
