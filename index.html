@@ -656,7 +656,8 @@ function renderGrid() {
         </div>
         ${p.wb_link ? `<a class="card-link" href="${p.wb_link}" target="_blank" rel="noopener">Смотреть на WB →</a>` : ''}
         <button class="card-add-btn ${cartItems.has(p.stockKey) ? 'in-cart' : ''}"
-          onclick="event.stopPropagation(); toggleCart(${JSON.stringify({id:p.id, stockKey:p.stockKey, name:p.name, size:p.size, photo:p.photo})})">
+          data-key="${p.stockKey}" data-id="${p.id}" data-name="${p.name.replace(/"/g,'&quot;')}" data-size="${p.size}" data-photo="${p.photo}"
+          onclick="event.stopPropagation(); toggleCartBtn(this)">
           ${cartItems.has(p.stockKey) ? '✓ В корзине' : '+ В корзину'}
         </button>
       </div>
@@ -700,6 +701,17 @@ function updateCount() {
 // CART
 // ================================================================
 let cartItems = new Map(); // stockKey -> product
+
+function toggleCartBtn(el) {
+  const p = {
+    stockKey: el.dataset.key,
+    id: el.dataset.id,
+    name: el.dataset.name,
+    size: el.dataset.size,
+    photo: el.dataset.photo,
+  };
+  toggleCart(p);
+}
 
 function toggleCart(p) {
   if (cartItems.has(p.stockKey)) {
