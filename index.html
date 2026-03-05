@@ -32,6 +32,17 @@
   .logo em { color: var(--accent); font-style: normal; }
   .header-sub { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #8a857e; font-weight: 300; }
 
+  /* NAV TABS */
+  .header-nav { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 7px 20px; background: transparent; border: 1px solid rgba(245,242,238,0.2);
+    color: rgba(245,242,238,0.55); font-family: 'Jost', sans-serif;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; border-radius: 4px; transition: all 0.2s;
+  }
+  .nav-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-tab.active { background: var(--accent); border-color: var(--accent); color: #1a1714; font-weight: 500; }
+
   /* LAYOUT */
   .layout { display: grid; grid-template-columns: 290px 1fr; min-height: calc(100vh - 72px); }
 
@@ -369,7 +380,10 @@
 
 <header>
   <div class="logo">Кастом<em>Дизайн</em></div>
-  <div class="header-sub">Каталог фотообоев</div>
+  <nav class="header-nav">
+    <button class="nav-tab active" id="tabWallpaper" onclick="switchCatalog('wallpaper')">Фотообои</button>
+    <button class="nav-tab" id="tabPainting" onclick="switchCatalog('painting')">Картины</button>
+  </nav>
   <button class="cart-btn" onclick="openCart()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     Корзина
@@ -412,14 +426,18 @@
 // ⚙️  НАСТРОЙКИ — замените ID таблиц на свои после публикации
 // ================================================================
 const CONFIG = {
-  // ID Google таблицы
-  SHEET_ID: '1cI4ffnSbp4RTJxu2n11WuyJOIFLlMUzkhfIm_qWHkZg',
-
-  // Названия листов
-  PRODUCTS_SHEET: 'Товары',
-  STOCK_SHEET: 'Остатки',
-
-  // Количество карточек на странице
+  wallpaper: {
+    SHEET_ID: '1cI4ffnSbp4RTJxu2n11WuyJOIFLlMUzkhfIm_qWHkZg',
+    PRODUCTS_SHEET: 'Товары',
+    STOCK_SHEET: 'Остатки',
+    LABEL: 'Фотообои',
+  },
+  painting: {
+    SHEET_ID: '1rbc9UgRl4Xada65mcBLo0-2bh3fQpLkxmsz6a2SNzVY',
+    PRODUCTS_SHEET: 'Товары',
+    STOCK_SHEET: 'Остатки',
+    LABEL: 'Картины',
+  },
   PAGE_SIZE: 36,
 };
 // ================================================================
@@ -472,8 +490,11 @@ function getColor(name) {
 // ================================================================
 // STATE
 // ================================================================
+let currentCatalog = 'wallpaper'; // 'wallpaper' | 'painting'
+let catalogCache = {}; // cache loaded data per catalog
+
 let allProducts = [];
-let stockMap = {};  // wb_art -> quantity
+let stockMap = {};
 let filteredProducts = [];
 let currentPage = 1;
 let activeSize = null;
@@ -483,13 +504,12 @@ let searchQuery = '';
 // ================================================================
 // ЗАГРУЗКА ИЗ GOOGLE SHEETS (fetch + JSON parse)
 // ================================================================
-async function fetchSheet(sheetName) {
+async function fetchSheet(sheetName, sheetId) {
   const encoded = encodeURIComponent(sheetName);
-  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encoded}`;
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encoded}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const text = await res.text();
-  // Google оборачивает ответ в /*O_o*/ google.visualization.Query.setResponse({...});
   const json = JSON.parse(text.replace(/^[\s\S]*?google\.visualization\.Query\.setResponse\(/, '').replace(/\);?\s*$/, ''));
   if (!json.table) throw new Error('Таблица не найдена. Проверьте название листа.');
   return json.table;
@@ -532,16 +552,62 @@ function parseStock(table) {
 // ================================================================
 // INIT
 // ================================================================
+async function loadCatalog(catalogKey) {
+  // Return from cache if already loaded
+  if (catalogCache[catalogKey]) {
+    allProducts = catalogCache[catalogKey].products;
+    stockMap    = catalogCache[catalogKey].stock;
+    return;
+  }
+
+  const cfg = CONFIG[catalogKey];
+  const [productTable, stockTable] = await Promise.all([
+    fetchSheet(cfg.PRODUCTS_SHEET, cfg.SHEET_ID),
+    fetchSheet(cfg.STOCK_SHEET, cfg.SHEET_ID),
+  ]);
+
+  allProducts = parseProducts(productTable);
+  stockMap    = parseStock(stockTable);
+
+  // Save to cache
+  catalogCache[catalogKey] = { products: allProducts, stock: stockMap };
+}
+
+async function switchCatalog(catalogKey) {
+  if (currentCatalog === catalogKey) return;
+  currentCatalog = catalogKey;
+
+  // Update tab styles
+  document.getElementById('tabWallpaper').classList.toggle('active', catalogKey === 'wallpaper');
+  document.getElementById('tabPainting').classList.toggle('active', catalogKey === 'painting');
+
+  // Reset filters
+  activeSize = null; activeColors.clear(); searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  currentPage = 1;
+
+  // Show loading
+  document.getElementById('loadingScreen').classList.remove('hidden');
+  document.getElementById('grid').innerHTML = '';
+
+  try {
+    await loadCatalog(catalogKey);
+    document.getElementById('loadingScreen').classList.add('hidden');
+    buildFilters();
+    applyFilters();
+  } catch (err) {
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('grid').innerHTML = `
+      <div class="error-screen">
+        <h2>Не удалось загрузить каталог</h2>
+        <p>Ошибка: <code>${err.message}</code></p>
+      </div>`;
+  }
+}
+
 async function init() {
   try {
-    const [productTable, stockTable] = await Promise.all([
-      fetchSheet(CONFIG.PRODUCTS_SHEET),
-      fetchSheet(CONFIG.STOCK_SHEET),
-    ]);
-
-    allProducts = parseProducts(productTable);
-    stockMap    = parseStock(stockTable);
-
+    await loadCatalog('wallpaper');
     document.getElementById('loadingScreen').classList.add('hidden');
     buildFilters();
     applyFilters();
@@ -551,8 +617,7 @@ async function init() {
     document.getElementById('grid').innerHTML = `
       <div class="error-screen">
         <h2>Не удалось загрузить каталог</h2>
-        <p>Проверьте, что в файле <code>catalog.html</code> указан правильный <code>SHEET_ID</code><br>
-        и что таблица открыта для просмотра всем по ссылке.<br><br>
+        <p>Проверьте, что таблица открыта для просмотра всем по ссылке.<br><br>
         Ошибка: <code>${err.message}</code></p>
       </div>`;
   }
