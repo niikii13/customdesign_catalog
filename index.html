@@ -24,9 +24,8 @@
   /* HEADER */
   header {
     background: var(--text); color: #f5f2ee;
-    padding: 0 40px; display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
+    padding: 0 40px; display: flex;
+    align-items: center; justify-content: space-between;
     height: 72px;
     position: sticky; top: 0; z-index: 100;
     transition: background 0.3s ease, backdrop-filter 0.3s ease;
@@ -36,10 +35,11 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
-  /* desktop: cart pushed to right edge */
-  header > .header-top-row { display: contents; }
-  header > .header-nav { justify-self: center; }
-  header > .header-top-row > .cart-btn { justify-self: end; grid-column: 3; }
+  /* desktop: logo left, nav absolute center, cart right */
+  .header-top-row { display: contents; }
+  .header-nav {
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
   .logo { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; }
   .header-top-row { display: contents; }
   .logo em { color: var(--accent); font-style: normal; }
