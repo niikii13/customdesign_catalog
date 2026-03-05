@@ -475,18 +475,7 @@
 // ⚙️  НАСТРОЙКИ — замените ID таблиц на свои после публикации
 // ================================================================
 const CONFIG = {
-  wallpaper: {
-    SHEET_ID: '1cI4ffnSbp4RTJxu2n11WuyJOIFLlMUzkhfIm_qWHkZg',
-    PRODUCTS_SHEET: 'Товары',
-    STOCK_SHEET: 'Остатки',
-    LABEL: 'Фотообои',
-  },
-  painting: {
-    SHEET_ID: '1rbc9UgRl4Xada65mcBLo0-2bh3fQpLkxmsz6a2SNzVY',
-    PRODUCTS_SHEET: 'Товары',
-    STOCK_SHEET: 'Остатки',
-    LABEL: 'Картины',
-  },
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzT0AN2yAjuEQsHrtOECQo0Js6fZDFmQCP2lywaMarKLiygcz3-Eljy4TygDvACWQdT/exec',
   PAGE_SIZE: 36,
 };
 // ================================================================
@@ -553,69 +542,16 @@ let searchQuery = '';
 // ================================================================
 // ЗАГРУЗКА ИЗ GOOGLE SHEETS (fetch + JSON parse)
 // ================================================================
-async function fetchSheetChunk(sheetName, sheetId, offset, limit) {
-  const encoded = encodeURIComponent(sheetName);
-  const query = encodeURIComponent(`select * limit ${limit} offset ${offset}`);
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encoded}&tq=${query}`;
+async function fetchFromScript(catalog, action) {
+  const url = `${CONFIG.SCRIPT_URL}?catalog=${catalog}&action=${action}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text();
-  const json = JSON.parse(text.replace(/^[\s\S]*?google\.visualization\.Query\.setResponse\(/, '').replace(/\);?\s*$/, ''));
-  return json.table;
+  const data = await res.json();
+  if (!data.ok) throw new Error('Ошибка скрипта');
+  return data;
 }
 
-async function fetchSheet(sheetName, sheetId) {
-  const CHUNK = 2000;
-  let offset = 0;
-  let allRows = [];
-  let cols = null;
-
-  while (true) {
-    const table = await fetchSheetChunk(sheetName, sheetId, offset, CHUNK);
-    if (!table || !table.rows || table.rows.length === 0) break;
-    if (!cols) cols = table.cols;
-    allRows = allRows.concat(table.rows);
-    if (table.rows.length < CHUNK) break; // последний чанк
-    offset += CHUNK;
-  }
-
-  if (!cols) throw new Error('Таблица не найдена. Проверьте название листа.');
-  return { cols, rows: allRows };
-}
-
-function parseProducts(table) {
-  if (!table || !table.rows) return [];
-  // Реальные колонки таблицы:
-  // [0] Артикул продавца, [1] Артикул WB, [2] Наименование, [3] Категория,
-  // [4] Цвет, [5] Размер, [6] Фото (несколько через ;), [7] Ссылка WB
-  return table.rows.map(row => {
-    const c = row.c;
-    const seller_art  = c[0]?.v ? String(c[0].v).trim() : '';
-    const wb_art      = c[1]?.v ? String(c[1].v) : '';
-    const name        = c[2]?.v ? String(c[2].v).trim() : '';
-    const colors      = c[4]?.v ? String(c[4].v).split(';').map(s=>s.trim()).filter(Boolean) : [];
-    const size        = c[5]?.v ? String(c[5].v).trim() : '';
-    // Берём первое фото из списка через ;
-    const photoRaw    = c[6]?.v ? String(c[6].v).trim() : '';
-    const photo       = photoRaw.split(';')[0].trim();
-    const wb_link     = c[7]?.v ? String(c[7].v).trim() : (wb_art ? `https://www.wildberries.ru/catalog/${wb_art}/detail.aspx` : '');
-    // stockKey — внутренний артикул продавца (по нему матчим остатки)
-    return { id: wb_art, stockKey: seller_art, name, colors, size, photo, wb_link };
-  }).filter(p => p.name && p.stockKey);
-}
-
-function parseStock(table) {
-  const map = {};
-  if (!table || !table.rows) return map;
-  // columns: Артикул продавца [0], Остаток [1]
-  table.rows.forEach(row => {
-    const c = row.c;
-    const art = c[0]?.v ? String(c[0].v).trim() : '';
-    const qty = c[1]?.v ? Number(c[1].v) : 0;
-    if (art) map[art] = qty;
-  });
-  return map;
-}
+// parseProducts and parseStock not needed — Apps Script returns ready data
 
 // ================================================================
 // INIT
@@ -628,17 +564,18 @@ async function loadCatalog(catalogKey) {
     return;
   }
 
-  const cfg = CONFIG[catalogKey];
   const prog = document.getElementById('loadingProgress');
-  if (prog) prog.textContent = 'Загрузка товаров...';
-  const [productTable, stockTable] = await Promise.all([
-    fetchSheet(cfg.PRODUCTS_SHEET, cfg.SHEET_ID),
-    fetchSheet(cfg.STOCK_SHEET, cfg.SHEET_ID),
+  if (prog) prog.textContent = 'Загрузка...';
+
+  const [prodData, stockData] = await Promise.all([
+    fetchFromScript(catalogKey, 'products'),
+    fetchFromScript(catalogKey, 'stock'),
   ]);
+
   if (prog) prog.textContent = '';
 
-  allProducts = parseProducts(productTable);
-  stockMap    = parseStock(stockTable);
+  allProducts = prodData.products;
+  stockMap    = stockData.stock;
 
   // Save to cache
   catalogCache[catalogKey] = { products: allProducts, stock: stockMap };
