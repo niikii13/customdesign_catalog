@@ -677,6 +677,7 @@ async function switchCatalog(catalogKey) {
 }
 
 async function init() {
+  loadCart();
   try {
     await loadCatalog('wallpaper');
     document.getElementById('loadingScreen').classList.add('hidden');
@@ -870,6 +871,23 @@ function updateCount() {
 // ================================================================
 let cartItems = new Map(); // stockKey -> product
 
+function saveCart() {
+  try {
+    const arr = [...cartItems.entries()];
+    localStorage.setItem('kd_cart', JSON.stringify(arr));
+  } catch(e) {}
+}
+
+function loadCart() {
+  try {
+    const raw = localStorage.getItem('kd_cart');
+    if (!raw) return;
+    const arr = JSON.parse(raw);
+    cartItems = new Map(arr);
+    updateCartCount();
+  } catch(e) {}
+}
+
 function toggleCartBtn(el) {
   const p = {
     stockKey: el.dataset.key,
@@ -892,11 +910,13 @@ function toggleCart(p) {
     cartItems.set(p.stockKey, p);
   }
   updateCartCount();
+  saveCart();
 }
 
 function removeFromCart(stockKey) {
   cartItems.delete(stockKey);
   updateCartCount();
+  saveCart();
   renderCartPanel();
   // Update the matching card button in the grid without re-render
   const btn = document.querySelector(`.card-add-btn[data-key="${stockKey}"]`);
