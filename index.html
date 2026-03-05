@@ -475,7 +475,8 @@
 // ⚙️  НАСТРОЙКИ — замените ID таблиц на свои после публикации
 // ================================================================
 const CONFIG = {
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzT0AN2yAjuEQsHrtOECQo0Js6fZDFmQCP2lywaMarKLiygcz3-Eljy4TygDvACWQdT/exec',
+  SCRIPT_URL_WALLPAPER: 'https://script.google.com/macros/s/AKfycbw3raWRSbEM2yUx2jkeM_QOm8WefTiwPQgv5Rep3LrfyYdEIqMFWWteNOiD9GqHQ39-/exec',
+  SCRIPT_URL_PAINTING:  'https://script.google.com/macros/s/AKfycbzT0AN2yAjuEQsHrtOECQo0Js6fZDFmQCP2lywaMarKLiygcz3-Eljy4TygDvACWQdT/exec',
   PAGE_SIZE: 36,
 };
 // ================================================================
@@ -543,7 +544,8 @@ let searchQuery = '';
 // ЗАГРУЗКА ИЗ GOOGLE SHEETS (fetch + JSON parse)
 // ================================================================
 async function fetchFromScript(catalog, action) {
-  const url = `${CONFIG.SCRIPT_URL}?catalog=${catalog}&action=${action}`;
+  const scriptUrl = catalog === 'painting' ? CONFIG.SCRIPT_URL_PAINTING : CONFIG.SCRIPT_URL_WALLPAPER;
+  const url = `${scriptUrl}?catalog=${catalog}&action=${action}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
