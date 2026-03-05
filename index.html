@@ -327,17 +327,21 @@ async function fetchSheet(sheetName) {
 
 function parseProducts(table) {
   if (!table || !table.rows) return [];
-  // columns: Артикул WB [0], Артикул продавца [1], Наименование [2], Цвет [3], Размер [4], Фото [5], Ссылка WB [6]
+  // Реальные колонки таблицы:
+  // [0] Артикул продавца, [1] Артикул WB, [2] Наименование, [3] Категория,
+  // [4] Цвет, [5] Размер, [6] Фото (несколько через ;), [7] Ссылка WB
   return table.rows.map(row => {
     const c = row.c;
-    const wb_art      = c[0]?.v ? String(c[0].v).trim() : '';
-    const seller_art  = c[1]?.v ? String(c[1].v).trim() : '';
+    const seller_art  = c[0]?.v ? String(c[0].v).trim() : '';
+    const wb_art      = c[1]?.v ? String(c[1].v) : '';
     const name        = c[2]?.v ? String(c[2].v).trim() : '';
-    const colors      = c[3]?.v ? String(c[3].v).split(';').map(s=>s.trim()).filter(Boolean) : [];
-    const size        = c[4]?.v ? String(c[4].v).trim() : '';
-    const photo       = c[5]?.v ? String(c[5].v).trim() : '';
-    const wb_link     = c[6]?.v ? String(c[6].v).trim() : (wb_art ? `https://www.wildberries.ru/catalog/${wb_art}/detail.aspx` : '');
-    // stockKey — внутренний артикул продавца (по нему будем матчить остатки)
+    const colors      = c[4]?.v ? String(c[4].v).split(';').map(s=>s.trim()).filter(Boolean) : [];
+    const size        = c[5]?.v ? String(c[5].v).trim() : '';
+    // Берём первое фото из списка через ;
+    const photoRaw    = c[6]?.v ? String(c[6].v).trim() : '';
+    const photo       = photoRaw.split(';')[0].trim();
+    const wb_link     = c[7]?.v ? String(c[7].v).trim() : (wb_art ? `https://www.wildberries.ru/catalog/${wb_art}/detail.aspx` : '');
+    // stockKey — внутренний артикул продавца (по нему матчим остатки)
     return { id: wb_art, stockKey: seller_art, name, colors, size, photo, wb_link };
   }).filter(p => p.name && p.stockKey);
 }
