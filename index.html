@@ -283,6 +283,11 @@
     .cart-btn { border: none; padding: 6px 8px; gap: 4px; }
   }
 
+  /* ── SKELETON ── */
+  .card-img.lazy { background: linear-gradient(90deg, #ede8e0 25%, #e4ddd3 50%, #ede8e0 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
   /* ── CART BUTTON IN HEADER ── */
   .cart-btn {
     display: flex; align-items: center; gap: 8px;
@@ -548,15 +553,34 @@ let searchQuery = '';
 // ================================================================
 // ЗАГРУЗКА ИЗ GOOGLE SHEETS (fetch + JSON parse)
 // ================================================================
-async function fetchSheet(sheetName, sheetId) {
+async function fetchSheetChunk(sheetName, sheetId, offset, limit) {
   const encoded = encodeURIComponent(sheetName);
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encoded}`;
+  const query = encodeURIComponent(`select * limit ${limit} offset ${offset}`);
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encoded}&tq=${query}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const text = await res.text();
   const json = JSON.parse(text.replace(/^[\s\S]*?google\.visualization\.Query\.setResponse\(/, '').replace(/\);?\s*$/, ''));
-  if (!json.table) throw new Error('Таблица не найдена. Проверьте название листа.');
   return json.table;
+}
+
+async function fetchSheet(sheetName, sheetId) {
+  const CHUNK = 2000;
+  let offset = 0;
+  let allRows = [];
+  let cols = null;
+
+  while (true) {
+    const table = await fetchSheetChunk(sheetName, sheetId, offset, CHUNK);
+    if (!table || !table.rows || table.rows.length === 0) break;
+    if (!cols) cols = table.cols;
+    allRows = allRows.concat(table.rows);
+    if (table.rows.length < CHUNK) break; // последний чанк
+    offset += CHUNK;
+  }
+
+  if (!cols) throw new Error('Таблица не найдена. Проверьте название листа.');
+  return { cols, rows: allRows };
 }
 
 function parseProducts(table) {
@@ -605,10 +629,13 @@ async function loadCatalog(catalogKey) {
   }
 
   const cfg = CONFIG[catalogKey];
+  const prog = document.getElementById('loadingProgress');
+  if (prog) prog.textContent = 'Загрузка товаров...';
   const [productTable, stockTable] = await Promise.all([
     fetchSheet(cfg.PRODUCTS_SHEET, cfg.SHEET_ID),
     fetchSheet(cfg.STOCK_SHEET, cfg.SHEET_ID),
   ]);
+  if (prog) prog.textContent = '';
 
   allProducts = parseProducts(productTable);
   stockMap    = parseStock(stockTable);
@@ -777,6 +804,33 @@ function renderGrid() {
       </div>
     </div>`;
   }).join('');
+
+  // Запускаем lazy loading для новых изображений
+  initLazyImages();
+}
+
+// IntersectionObserver для lazy loading
+let lazyObserver = null;
+function initLazyImages() {
+  if (lazyObserver) lazyObserver.disconnect();
+  const images = document.querySelectorAll('img.lazy[data-src]');
+  if ('IntersectionObserver' in window) {
+    lazyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+          img.classList.remove('lazy');
+          lazyObserver.unobserve(img);
+        }
+      });
+    }, { rootMargin: '300px 0px' });
+    images.forEach(img => lazyObserver.observe(img));
+  } else {
+    // Fallback для старых браузеров
+    images.forEach(img => { img.src = img.dataset.src; img.classList.remove('lazy'); });
+  }
 }
 
 function renderPagination() {
