@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КастомДизайн — Каталог фотообоев</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ee;
+    --surface: #ffffff;
+    --text: #1a1714;
+    --muted: #8a857e;
+    --accent: #c8a96e;
+    --accent-dark: #9c7d47;
+    --border: #e4dfd8;
+    --tag-bg: #edeae5;
+    --shadow: 0 2px 20px rgba(0,0,0,0.07);
+    --shadow-hover: 0 8px 40px rgba(0,0,0,0.14);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: var(--text); color: #f5f2ee;
+    padding: 0 40px; display: flex; align-items: center;
+    justify-content: space-between; height: 72px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; }
+  .logo em { color: var(--accent); font-style: normal; }
+  .header-sub { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #8a857e; font-weight: 300; }
+
+  /* LAYOUT */
+  .layout { display: grid; grid-template-columns: 290px 1fr; min-height: calc(100vh - 72px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface); border-right: 1px solid var(--border);
+    padding: 28px 22px; position: sticky; top: 72px;
+    height: calc(100vh - 72px); overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .filter-section { margin-bottom: 28px; }
+  .filter-title {
+    font-size: 10px; font-weight: 500; letter-spacing: 2.5px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+  }
+
+  /* SEARCH */
+  .search-wrap { position: relative; }
+  .search-input {
+    width: 100%; padding: 10px 14px 10px 38px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: var(--bg); font-family: 'Jost', sans-serif;
+    font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+
+  /* SIZE */
+  .size-options { display: flex; flex-direction: column; gap: 6px; }
+  .size-btn {
+    padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px;
+    background: transparent; font-family: 'Jost', sans-serif; font-size: 13px;
+    color: var(--text); cursor: pointer; text-align: left; transition: all 0.18s;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .size-btn:hover { border-color: var(--accent); color: var(--accent-dark); }
+  .size-btn.active { background: var(--text); border-color: var(--text); color: #f5f2ee; }
+  .size-count { font-size: 11px; opacity: 0.55; }
+
+  /* COLOR */
+  .color-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .color-chip {
+    padding: 5px 10px; border: 1px solid var(--border); border-radius: 20px;
+    font-size: 11px; cursor: pointer; transition: all 0.18s; background: transparent;
+    font-family: 'Jost', sans-serif; color: var(--text); white-space: nowrap;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .color-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); flex-shrink: 0; }
+  .color-chip:hover { border-color: var(--accent); }
+  .color-chip.active { background: var(--text); border-color: var(--text); color: #f5f2ee; }
+
+  .reset-btn {
+    width: 100%; padding: 9px; background: transparent; border: 1px solid var(--border);
+    border-radius: 4px; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--muted);
+    cursor: pointer; transition: all 0.18s; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 6px;
+  }
+  .reset-btn:hover { border-color: var(--text); color: var(--text); }
+
+  /* MAIN */
+  .main { padding: 28px 36px; }
+  .results-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .results-count { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; }
+  .results-count span { color: var(--accent-dark); }
+  .results-meta { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+
+  /* GRID */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
+
+  /* CARD */
+  .card {
+    background: var(--surface); border-radius: 6px; overflow: hidden;
+    box-shadow: var(--shadow); transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer; animation: fadeUp 0.3s ease both;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-img-wrap { position: relative; padding-top: 68%; overflow: hidden; background: var(--tag-bg); }
+  .card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+  .card:hover .card-img { transform: scale(1.05); }
+  .card-img-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 28px; }
+  .card-wb-badge {
+    position: absolute; top: 9px; right: 9px; background: rgba(26,23,20,0.8);
+    color: #f5f2ee; font-size: 9px; letter-spacing: 1px; padding: 3px 7px;
+    border-radius: 3px; text-transform: uppercase; opacity: 0; transition: opacity 0.2s;
+  }
+  .card:hover .card-wb-badge { opacity: 1; }
+  .card-stock {
+    position: absolute; bottom: 9px; left: 9px; background: rgba(200,169,110,0.92);
+    color: #fff; font-size: 10px; font-weight: 500; padding: 3px 8px;
+    border-radius: 3px; letter-spacing: 0.5px;
+  }
+  .card-body { padding: 14px; }
+  .card-name {
+    font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 400;
+    margin-bottom: 9px; line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+  .card-size {
+    font-size: 10px; letter-spacing: 1.5px; color: var(--muted);
+    text-transform: uppercase; background: var(--tag-bg); padding: 3px 7px; border-radius: 3px;
+  }
+  .card-colors { display: flex; gap: 3px; }
+  .card-color-dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.7); box-shadow: 0 0 0 1px rgba(0,0,0,0.1); }
+  .card-link {
+    display: block; text-align: center; padding: 8px; background: var(--tag-bg); border-radius: 4px;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    text-decoration: none; transition: all 0.2s; font-weight: 500;
+  }
+  .card-link:hover { background: var(--text); color: #f5f2ee; }
+
+  /* PAGINATION */
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 44px; padding-bottom: 44px; }
+  .page-btn {
+    min-width: 38px; height: 38px; padding: 0 10px; border: 1px solid var(--border);
+    border-radius: 4px; background: transparent; font-family: 'Jost', sans-serif;
+    font-size: 13px; color: var(--text); cursor: pointer; transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-dark); }
+  .page-btn.active { background: var(--text); border-color: var(--text); color: #f5f2ee; }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .page-info { font-size: 13px; color: var(--muted); padding: 0 6px; }
+
+  /* STATES */
+  .empty { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--muted); }
+  .empty-icon { font-size: 44px; margin-bottom: 14px; }
+  .empty-text { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; }
+  .empty-sub { font-size: 13px; margin-top: 6px; }
+
+  .loading-screen {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 999; gap: 20px;
+  }
+  .loading-logo { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; }
+  .loading-logo em { color: var(--accent); font-style: normal; }
+  .loading-bar { width: 200px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+  .loading-bar-fill { height: 100%; background: var(--accent); border-radius: 1px; animation: loadbar 2s ease-in-out infinite; }
+  .loading-text { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+  .error-screen {
+    grid-column: 1/-1; text-align: center; padding: 60px 20px;
+  }
+  .error-screen h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; margin-bottom: 12px; color: var(--text); }
+  .error-screen p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .error-screen code { background: var(--tag-bg); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+
+  @keyframes loadbar { 0%{width:0;margin-left:0} 50%{width:100%;margin-left:0} 100%{width:0;margin-left:100%} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .loading-screen.hidden { display: none; }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; }
+    .main { padding: 20px; }
+    header { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">Кастом<em>Дизайн</em></div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  <div class="loading-text">Загрузка каталога...</div>
+</div>
+
+<header>
+  <div class="logo">Кастом<em>Дизайн</em></div>
+  <div class="header-sub">Каталог фотообоев</div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="filter-section">
+      <div class="filter-title">Поиск</div>
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Название обоев...">
+      </div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Размер</div>
+      <div class="size-options" id="sizeOptions"></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Цвет — все <span id="colorCountLabel"></span></div>
+      <div class="color-grid" id="colorGrid"></div>
+    </div>
+    <button class="reset-btn" id="resetBtn">✕ Сбросить фильтры</button>
+  </aside>
+
+  <main class="main">
+    <div class="results-bar">
+      <div class="results-count">Найдено: <span id="countDisplay">0</span></div>
+      <div class="results-meta" id="pageInfo"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<script>
+// ================================================================
+// ⚙️  НАСТРОЙКИ — замените ID таблиц на свои после публикации
+// ================================================================
+const CONFIG = {
+  // ID Google таблицы
+  SHEET_ID: '1lZs2wxOJMQixDOAUIssqW3dwuEjxl-Oy',
+
+  // Названия листов
+  PRODUCTS_SHEET: 'Товары',
+  STOCK_SHEET: 'Остатки',
+
+  // Количество карточек на странице
+  PAGE_SIZE: 36,
+};
+// ================================================================
+
+// COLOR MAP — все 96 цветов из каталога
+const COLOR_MAP = {
+  'серый':'#9e9e9e','черный':'#2d2d2d','белый':'#f0f0f0','голубой':'#64b5f6',
+  'оранжевый':'#ff8c42','желтый':'#ffd54f','синий':'#3a7bd5','бежевый':'#d4b896',
+  'розовый':'#f48fb1','зеленый':'#66bb6a','коричневый':'#8d6e63','красный':'#e53935',
+  'светло-серый':'#c8c8c8','фиолетовый':'#9575cd','темно-серый':'#616161',
+  'бирюзовый':'#26c6da','темно-синий':'#1a237e','сиреневый':'#ce93d8',
+  'кремовый':'#fff8dc','светло-розовый':'#fce4ec','фуксия':'#e040fb',
+  'светло-зеленый':'#a5d6a7','светло-бежевый':'#f5deb3','светло-коричневый':'#bcaaa4',
+  'темно-зеленый':'#2e7d32','светло-желтый':'#fff9c4','коралловый':'#ff7043',
+  'темно-коричневый':'#4e342e','слоновая кость':'#fffff0','горчичный':'#f9a825',
+  'светло-синий':'#90caf9','салатовый':'#c5e1a5','лиловый':'#ce93d8',
+  'малиновый':'#c62828','темно-розовый':'#880e4f','бордовый':'#7b1fa2',
+  'оливковый':'#827717','темно-бежевый':'#a08060','лазурный':'#29b6f6',
+  'перламутровый':'#e8d5c4','хаки':'#8d8a5b','молочный':'#faf3e0',
+  'шоколадный':'#5d3a1a','темно-бордовый':'#4a0010','рыжий':'#bf5700',
+  'персиковый':'#ffcba4','терракот':'#c0614c','терракота':'#c0614c',
+  'розовая фуксия':'#e91e8c','чернильный':'#1b2a6b','черный матовый':'#1a1a1a',
+  'глубокий коричневый':'#3e1f00','глубокий черный':'#0d0d0d','светло-голубой':'#b3e5fc',
+  'глубокий сине-зеленый':'#006064','золотистый':'#ffc107','пыльная роза':'#c4a0a0',
+  'рыжий терракот':'#b84c2a','голубой лед':'#cfe8f5','розовый тауп':'#c49a9a',
+  'средне-серый':'#808080','фиолетовый меланж':'#7e57c2','черный графит':'#2b2b2b',
+  'белый матовый':'#f5f5f5','пудровый':'#f9e0d6','сине-фиолетовый':'#5c35cc',
+  'малиново-розовый':'#e91e63','темный хаки':'#5d5d2a','графит':'#546e7a',
+  'зеленовато-бежевый':'#b5c3a0','серо-бежевый':'#c9b9a8','сине-морской':'#005f87',
+  'холодный зеленый':'#4caf7d','травяной зеленый':'#5c8a4a','темно-бирюзовый':'#00695c',
+  'темно-красный':'#b71c1c','пастельно-песочный':'#f0dfc0','горький шоколад':'#4b2c20',
+  'серо-бежевый светлый':'#d6cbbf','розово-лавандовый':'#e0b0d5','розовая гвоздика':'#f4a0b5',
+  'персиково-розовый':'#ffb3a7','сиреневый меланж':'#c8a0d8','розовая долина':'#f0c0c8',
+  'мятно-серый':'#b0c8c4','песочный':'#e8d5a0','серый шелк':'#b8b0a8',
+  'зеленый дым':'#8fa878','зеленый лист':'#4caf50','голубино-синий':'#5080a0',
+  'светло-бирюзовый':'#80d8d8','небесный':'#87ceeb','серый гранит':'#808080',
+  'розово-пурпурный':'#d060b0','васильковый':'#4169b0','зелёный блеск':'#00c060',
+};
+
+function getColor(name) {
+  if (!name) return '#ddd';
+  const n = name.toLowerCase().trim();
+  if (COLOR_MAP[n]) return COLOR_MAP[n];
+  for (const k of Object.keys(COLOR_MAP)) {
+    if (n.includes(k)) return COLOR_MAP[k];
+  }
+  return '#c8a96e';
+}
+
+// ================================================================
+// STATE
+// ================================================================
+let allProducts = [];
+let stockMap = {};  // wb_art -> quantity
+let filteredProducts = [];
+let currentPage = 1;
+let activeSize = null;
+let activeColors = new Set();
+let searchQuery = '';
+
+// ================================================================
+// ЗАГРУЗКА ИЗ GOOGLE SHEETS (JSONP — работает локально и на сервере)
+// ================================================================
+function fetchSheet(sheetName) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_gsCb_' + Math.random().toString(36).slice(2);
+    const encoded = encodeURIComponent(sheetName);
+    const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encoded}&callback=${cbName}`;
+
+    const timeout = setTimeout(() => {
+      delete window[cbName];
+      script.remove();
+      reject(new Error('Timeout. Проверьте доступ к таблице: Поделиться → Все, у кого есть ссылка → Просматривать'));
+    }, 15000);
+
+    window[cbName] = (data) => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      script.remove();
+      if (data?.table) resolve(data.table);
+      else reject(new Error('Пустой ответ от Google Sheets'));
+    };
+
+    const script = document.createElement('script');
+    script.src = url;
+    script.onerror = () => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      reject(new Error('Не удалось загрузить таблицу. Убедитесь что доступ открыт: Поделиться → Все, у кого есть ссылка'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+function parseProducts(table) {
+  if (!table || !table.rows) return [];
+  // columns: Артикул WB [0], Артикул продавца [1], Наименование [2], Цвет [3], Размер [4], Фото [5], Ссылка WB [6]
+  return table.rows.map(row => {
+    const c = row.c;
+    const wb_art      = c[0]?.v ? String(c[0].v).trim() : '';
+    const seller_art  = c[1]?.v ? String(c[1].v).trim() : '';
+    const name        = c[2]?.v ? String(c[2].v).trim() : '';
+    const colors      = c[3]?.v ? String(c[3].v).split(';').map(s=>s.trim()).filter(Boolean) : [];
+    const size        = c[4]?.v ? String(c[4].v).trim() : '';
+    const photo       = c[5]?.v ? String(c[5].v).trim() : '';
+    const wb_link     = c[6]?.v ? String(c[6].v).trim() : (wb_art ? `https://www.wildberries.ru/catalog/${wb_art}/detail.aspx` : '');
+    // stockKey — внутренний артикул продавца (по нему будем матчить остатки)
+    return { id: wb_art, stockKey: seller_art, name, colors, size, photo, wb_link };
+  }).filter(p => p.name && p.stockKey);
+}
+
+function parseStock(table) {
+  const map = {};
+  if (!table || !table.rows) return map;
+  // columns: Артикул продавца [0], Остаток [1]
+  table.rows.forEach(row => {
+    const c = row.c;
+    const art = c[0]?.v ? String(c[0].v).trim() : '';
+    const qty = c[1]?.v ? Number(c[1].v) : 0;
+    if (art) map[art] = qty;
+  });
+  return map;
+}
+
+// ================================================================
+// INIT
+// ================================================================
+async function init() {
+  try {
+    const [productTable, stockTable] = await Promise.all([
+      fetchSheet(CONFIG.PRODUCTS_SHEET),
+      fetchSheet(CONFIG.STOCK_SHEET),
+    ]);
+
+    allProducts = parseProducts(productTable);
+    stockMap    = parseStock(stockTable);
+
+    document.getElementById('loadingScreen').classList.add('hidden');
+    buildFilters();
+    applyFilters();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('grid').innerHTML = `
+      <div class="error-screen">
+        <h2>Не удалось загрузить каталог</h2>
+        <p>Проверьте, что в файле <code>catalog.html</code> указан правильный <code>SHEET_ID</code><br>
+        и что таблица открыта для просмотра всем по ссылке.<br><br>
+        Ошибка: <code>${err.message}</code></p>
+      </div>`;
+  }
+}
+
+// ================================================================
+// FILTERS
+// ================================================================
+function buildFilters() {
+  // Sizes (only those with stock > 0)
+  const sizeCount = {};
+  allProducts.forEach(p => {
+    if (stockMap[p.stockKey] > 0 && p.size)
+      sizeCount[p.size] = (sizeCount[p.size]||0)+1;
+  });
+  const sizeOrder = ['100х280','200х280','300х280','400х280','500х280'];
+  const sizes = Object.entries(sizeCount).sort((a,b) => sizeOrder.indexOf(a[0]) - sizeOrder.indexOf(b[0]));
+
+  document.getElementById('sizeOptions').innerHTML = sizes.map(([s,cnt]) => `
+    <button class="size-btn" data-size="${s}" onclick="toggleSize('${s}')">
+      <span>${s} <small style="opacity:.4;font-size:10px">см</small></span>
+      <span class="size-count">${cnt.toLocaleString()}</span>
+    </button>`).join('');
+
+  // Colors — ALL 96, sorted by frequency in available stock
+  const colorCount = {};
+  allProducts.forEach(p => {
+    if (stockMap[p.stockKey] > 0)
+      p.colors.forEach(c => { colorCount[c] = (colorCount[c]||0)+1; });
+  });
+  const allColors = Object.entries(colorCount).sort((a,b) => b[1]-a[1]);
+  document.getElementById('colorCountLabel').textContent = `(${allColors.length})`;
+
+  document.getElementById('colorGrid').innerHTML = allColors.map(([c]) => `
+    <button class="color-chip" data-color="${c}" onclick="toggleColor('${c}')">
+      <span class="color-dot" style="background:${getColor(c)}"></span>${c}
+    </button>`).join('');
+}
+
+function toggleSize(size) {
+  activeSize = activeSize === size ? null : size;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.toggle('active', b.dataset.size === activeSize));
+  currentPage = 1; applyFilters();
+}
+
+function toggleColor(color) {
+  activeColors.has(color) ? activeColors.delete(color) : activeColors.add(color);
+  document.querySelectorAll('.color-chip').forEach(b => b.classList.toggle('active', activeColors.has(b.dataset.color)));
+  currentPage = 1; applyFilters();
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim().toLowerCase();
+  currentPage = 1; applyFilters();
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  activeSize = null; activeColors.clear(); searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('.size-btn,.color-chip').forEach(b => b.classList.remove('active'));
+  currentPage = 1; applyFilters();
+});
+
+// ================================================================
+// APPLY FILTERS
+// ================================================================
+function applyFilters() {
+  filteredProducts = allProducts.filter(p => {
+    // Скрываем товары с нулевым остатком или отсутствующие в таблице остатков
+    if (!stockMap[p.stockKey] || stockMap[p.stockKey] <= 0) return false;
+    if (activeSize && p.size !== activeSize) return false;
+    if (activeColors.size > 0 && ![...activeColors].some(c => p.colors.includes(c))) return false;
+    if (searchQuery && !p.name.toLowerCase().includes(searchQuery)) return false;
+    return true;
+  });
+  renderGrid(); renderPagination(); updateCount();
+}
+
+// ================================================================
+// RENDER
+// ================================================================
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  if (!filteredProducts.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Ничего не найдено</div><div class="empty-sub">Попробуйте изменить фильтры</div></div>`;
+    return;
+  }
+  const start = (currentPage-1)*CONFIG.PAGE_SIZE;
+  const items = filteredProducts.slice(start, start+CONFIG.PAGE_SIZE);
+  grid.innerHTML = items.map((p,i) => {
+    const qty = stockMap[p.stockKey] || 0;
+    return `
+    <div class="card" style="animation-delay:${(i%CONFIG.PAGE_SIZE)*0.018}s">
+      <div class="card-img-wrap">
+        ${p.photo
+          ? `<img class="card-img" src="${p.photo}" alt="${p.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=card-img-placeholder>🖼</div>'">`
+          : `<div class="card-img-placeholder">🖼</div>`}
+        ${p.wb_link ? `<div class="card-wb-badge">WB</div>` : ''}
+        <div class="card-stock">В наличии: ${qty} шт</div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-meta">
+          ${p.size ? `<span class="card-size">${p.size}</span>` : '<span></span>'}
+          <div class="card-colors">${p.colors.slice(0,4).map(c=>`<span class="card-color-dot" style="background:${getColor(c)}" title="${c}"></span>`).join('')}</div>
+        </div>
+        ${p.wb_link ? `<a class="card-link" href="${p.wb_link}" target="_blank" rel="noopener">Смотреть на WB →</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPagination() {
+  const total = Math.ceil(filteredProducts.length / CONFIG.PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (total <= 1) { el.innerHTML = ''; return; }
+  let pages = total <= 7 ? Array.from({length:total},(_,i)=>i+1) : [1];
+  if (total > 7) {
+    if (currentPage > 3) pages.push('…');
+    for (let i=Math.max(2,currentPage-1); i<=Math.min(total-1,currentPage+1); i++) pages.push(i);
+    if (currentPage < total-2) pages.push('…');
+    pages.push(total);
+  }
+  el.innerHTML = `
+    <button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>
+    ${pages.map(p=>p==='…'?`<span class="page-info">…</span>`:`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`).join('')}
+    <button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>→</button>`;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filteredProducts.length / CONFIG.PAGE_SIZE);
+  if (n<1||n>total) return;
+  currentPage = n; renderGrid(); renderPagination(); updateCount();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateCount() {
+  const total = filteredProducts.length;
+  const start = (currentPage-1)*CONFIG.PAGE_SIZE+1;
+  const end = Math.min(currentPage*CONFIG.PAGE_SIZE, total);
+  document.getElementById('countDisplay').textContent = total.toLocaleString('ru-RU');
+  document.getElementById('pageInfo').textContent = total>0 ? `Показано ${start}–${end}` : '';
+}
+
+init();
+</script>
+</body>
+</html>
