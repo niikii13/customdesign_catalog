@@ -128,14 +128,13 @@
   /* LIGHTBOX */
   .lightbox {
     position: fixed; inset: 0; z-index: 1000;
-    background: rgba(10,8,6,0); backdrop-filter: blur(0px);
+    background: rgba(10,8,6,0);
     display: flex; align-items: center; justify-content: center;
-    transition: background 0.3s ease, backdrop-filter 0.3s ease;
+    transition: background 0.3s ease;
     pointer-events: none;
-    contain: layout;
   }
   .lightbox.active {
-    background: rgba(10,8,6,0.88); backdrop-filter: blur(8px);
+    background: rgba(10,8,6,0.92);
     pointer-events: all; cursor: zoom-out;
   }
   .lightbox-img {
@@ -275,12 +274,12 @@
   /* ── CART MODAL OVERLAY ── */
   .cart-overlay {
     position: fixed; inset: 0; z-index: 200;
-    background: rgba(10,8,6,0); backdrop-filter: blur(0px);
-    transition: background 0.3s, backdrop-filter 0.3s;
+    background: rgba(10,8,6,0);
+    transition: background 0.3s;
     pointer-events: none;
   }
   .cart-overlay.open {
-    background: rgba(10,8,6,0.6); backdrop-filter: blur(6px);
+    background: rgba(10,8,6,0.55);
     pointer-events: all;
   }
 
