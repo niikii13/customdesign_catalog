@@ -51,6 +51,7 @@
     background: var(--surface);
     padding: 28px 22px; position: sticky; top: 72px;
     height: calc(100vh - 72px); overflow-y: auto;
+    z-index: 1; isolation: isolate;
   }
   .sidebar::-webkit-scrollbar { width: 3px; }
   .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -104,7 +105,7 @@
   .reset-btn:hover { border-color: var(--text); color: var(--text); }
 
   /* MAIN */
-  .main { padding: 28px 36px; }
+  .main { padding: 28px 36px; overflow: hidden; }
   .results-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .results-count { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; }
   .results-count span { color: var(--accent-dark); }
